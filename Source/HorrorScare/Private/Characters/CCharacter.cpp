@@ -2,6 +2,8 @@
 
 
 #include "Characters/CCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values
 ACCharacter::ACCharacter()
@@ -29,6 +31,4 @@ void ACCharacter::Tick(float DeltaTime)
 void ACCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
-

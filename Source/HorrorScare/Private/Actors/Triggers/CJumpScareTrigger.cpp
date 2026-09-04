@@ -4,6 +4,7 @@
 #include "Actors/Triggers/CJumpScareTrigger.h"
 
 #include "Characters/CCharacter.h"
+#include "Characters/Player/CPlayerController.h"
 #include "Widgets/CJumpScareWidget.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,7 +17,7 @@ ACJumpScareTrigger::ACJumpScareTrigger()
 	
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	RootComponent = TriggerVolume;
-	//TriggerVolume->SetBoxEvent(FVector(100.f, 100.f, 100.f));
+	TriggerVolume->SetBoxExtent(FVector(100.f, 100.f, 100.f));
 	TriggerVolume->SetCollisionProfileName(TEXT("Trigger"));
 
 }
@@ -32,8 +33,10 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	
 	bHasTriggered = true;
 	
-	//ACPlayerController* PC = Cast<ACPlayerController>(Player->GetController());
-	//if (!PC) return;
+	ACPlayerController* PC = Cast<ACPlayerController>(Player->GetController());
+	if (!PC) return;
+	
+	PC->TriggerJumpScare();
 	
 	// Assumes your HUD widget instance is cached somewhere accessible,
 	// e.g. on your custom PlayerController.
