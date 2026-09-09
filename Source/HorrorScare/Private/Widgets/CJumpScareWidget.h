@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Animation/WidgetAnimation.h"
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
