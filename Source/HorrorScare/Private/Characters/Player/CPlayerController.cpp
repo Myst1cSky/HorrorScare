@@ -9,20 +9,31 @@
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	InitializeWidget();
+}
+
+void ACPlayerController::TriggerJumpScare()
+{
+	UE_LOG(LogTemp, Warning, TEXT("TriggerJumpScare"));
+	if (!JumpScareWidget) return;
+	UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget"));
+	JumpScareWidget->PlayJumpScare();
+
+}
+
+void ACPlayerController::InitializeWidget()
+{
 	if (JumpScareWidgetClass)
 	{
 		JumpScareWidget = CreateWidget<UCJumpScareWidget>(this, JumpScareWidgetClass);
 		if (JumpScareWidget)
 		{
 			JumpScareWidget->AddToViewport(100);
+			UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget added"));
 		}
 	}
-}
-
-void ACPlayerController::TriggerJumpScare()
-{
-	if (!JumpScareWidget)
+	else
 	{
-		JumpScareWidget->PlayJumpScare();
+		UE_LOG(LogTemp, Warning, TEXT("WidgetClass does not exist"));
 	}
 }

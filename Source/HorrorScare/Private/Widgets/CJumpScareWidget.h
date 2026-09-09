@@ -28,4 +28,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "JumpScare")
 	void PlayJumpScare();
+	
+	UFUNCTION()
+	void OnJumpScareAnimFinished();
 };

@@ -40,4 +40,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* MoveInputAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "DebugInput")
+	UInputAction* DebugJumpScareAction;
 };

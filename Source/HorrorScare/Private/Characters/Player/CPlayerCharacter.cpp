@@ -33,7 +33,12 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(JumpInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::Jump);
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleLookInput);
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleMoveInput);
+		if (DebugJumpScareAction)
+		{
+			EnhancedInputComponent->BindAction(DebugJumpScareAction, ETriggerEvent::Started, this, &ACPlayerCharacter::DebugTriggerJumpScare);
+		}
 	}
+	
 }
 
 void ACPlayerCharacter::HandleLookInput(const struct FInputActionValue& InputActionValue)
@@ -64,4 +69,13 @@ FVector ACPlayerCharacter::GetLookFwdDirection() const
 FVector ACPlayerCharacter::GetMoveFwdDirection() const
 {
 	return FVector::CrossProduct(GetRightDirection(), FVector::UpVector);
+}
+
+// New function on your character, since input usually lives there in Enhanced Input setups
+void ACCharacter::DebugTriggerJumpScare()
+{
+	if (ACPlayerController* PC = Cast<ACPlayerController>(GetController()))
+	{
+		PC->TriggerJumpScare();
+	}
 }

@@ -16,14 +16,17 @@ class ACPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "HUD")
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
 	TSubclassOf<UCJumpScareWidget> JumpScareWidgetClass;
 	
-	UPROPERTY(BlueprintReadWrite, Category = "HUD")
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
 	UCJumpScareWidget* JumpScareWidget;
 	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void TriggerJumpScare();
+	
+	UFUNCTION()
+	void InitializeWidget();
 	
 protected:
 	virtual void BeginPlay() override;

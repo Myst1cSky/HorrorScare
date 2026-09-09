@@ -35,7 +35,7 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	
 	ACPlayerController* PC = Cast<ACPlayerController>(Player->GetController());
 	if (!PC) return;
-	
+	//
 	PC->TriggerJumpScare();
 	
 	// Assumes your HUD widget instance is cached somewhere accessible,
