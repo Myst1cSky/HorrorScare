@@ -16,8 +16,8 @@ void ACPlayerController::TriggerJumpScare()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TriggerJumpScare"));
 	if (!JumpScareWidget) return;
-	UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget"));
 	JumpScareWidget->PlayJumpScare();
+	UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget"));
 
 }
 

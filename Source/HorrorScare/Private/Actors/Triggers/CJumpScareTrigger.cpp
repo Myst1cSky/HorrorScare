@@ -17,7 +17,7 @@ ACJumpScareTrigger::ACJumpScareTrigger()
 	
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	RootComponent = TriggerVolume;
-	TriggerVolume->SetBoxExtent(FVector(100.f, 100.f, 100.f));
+	TriggerVolume->SetBoxExtent(FVector(10.f, 100.f, 100.f));
 	TriggerVolume->SetCollisionProfileName(TEXT("Trigger"));
 
 }
@@ -27,11 +27,13 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (bTriggerOnce && bHasTriggered) return;
+	if (bIsOnCooldown) return;
 	
 	ACCharacter* Player = Cast<ACCharacter>(OtherActor);
 	if (!Player || !Player->IsPlayerControlled()) return;
 	
 	bHasTriggered = true;
+	bIsOnCooldown = true;
 	
 	ACPlayerController* PC = Cast<ACPlayerController>(Player->GetController());
 	if (!PC) return;
@@ -41,6 +43,12 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	// Assumes your HUD widget instance is cached somewhere accessible,
 	// e.g. on your custom PlayerController.
 	//if (UUserWidget* HUDWidget = PC->GetHUD() ? nullptr : nullptr) {} // placeholder, see note below
+	
+	if (!bTriggerOnce)
+	{
+		GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &ACJumpScareTrigger::ResetCooldown,
+			CooldownDuration,false);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +57,11 @@ void ACJumpScareTrigger::BeginPlay()
 	Super::BeginPlay();
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACJumpScareTrigger::OnOverlapBegin);
 	
+}
+
+void ACJumpScareTrigger::ResetCooldown()
+{
+	bIsOnCooldown = false;
 }
 
 // Called every frame

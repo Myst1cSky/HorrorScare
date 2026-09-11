@@ -32,4 +32,7 @@ public:
 	
 	UFUNCTION()
 	void OnJumpScareAnimFinished();
+	
+protected:
+	virtual void NativeConstruct() override;
 };

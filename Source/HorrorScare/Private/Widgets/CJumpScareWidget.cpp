@@ -33,3 +33,12 @@ void UCJumpScareWidget::OnJumpScareAnimFinished()
 		ScareImage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+
+void UCJumpScareWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	if (ScareImage)
+	{
+		ScareImage->SetVisibility(ESlateVisibility::Hidden);
+	}
+}

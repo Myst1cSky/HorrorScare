@@ -33,9 +33,18 @@ protected:
 		bool bFromSweep, const FHitResult& SweepResult);
 	
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, Category = "JumpScare")
+	float CooldownDuration = 3.f;
+	
+	bool bIsOnCooldown = false;
+	
+	FTimerHandle CooldownTimerHandle;
+	
+	UFUNCTION()
+	void ResetCooldown();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };
