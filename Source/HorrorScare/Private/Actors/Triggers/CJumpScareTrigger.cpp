@@ -8,12 +8,13 @@
 #include "Widgets/CJumpScareWidget.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ACJumpScareTrigger::ACJumpScareTrigger()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	RootComponent = TriggerVolume;
@@ -44,6 +45,13 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	// e.g. on your custom PlayerController.
 	//if (UUserWidget* HUDWidget = PC->GetHUD() ? nullptr : nullptr) {} // placeholder, see note below
 	
+	if (bMoveAfterTeleport)
+	{
+		MoveStartLocation = TeleportLocation;
+		MoveElaspedTime = 0.f;
+		bIsMoving = true;
+	}
+	
 	if (!bTriggerOnce)
 	{
 		GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &ACJumpScareTrigger::ResetCooldown,
@@ -68,6 +76,24 @@ void ACJumpScareTrigger::ResetCooldown()
 void ACJumpScareTrigger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (!bIsMoving)
+	{
+		MoveElaspedTime += DeltaTime;
+		float Alpha = FMath::Clamp(MoveElaspedTime / MoveDuration, 0.f, 1.f);
+		
+		FVector NewLocation = FMath::Lerp(MoveStartLocation, MoveTargetLocation, Alpha);
+		SetActorLocation(NewLocation);
+		
+		DrawDebugSphere(GetWorld(), NewLocation, 50.f, 12, FColor::Red, false, 0.1f);
+		UE_LOG(LogTemp, Warning, TEXT("Trigger moving: Alpha=%.2f, Location=%s"), Alpha,*NewLocation.ToString())
+		
+		if (Alpha >= 1.f)
+		{
+			bIsMoving = false;
+			UE_LOG(LogTemp, Warning, TEXT("Trigger movement finished!"))
+		}
+	}
 
 }
 
