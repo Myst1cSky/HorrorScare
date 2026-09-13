@@ -9,12 +9,13 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+//#include "CJumpScareLocationManager.h"
 
 // Sets default values
 ACJumpScareTrigger::ACJumpScareTrigger()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	RootComponent = TriggerVolume;
@@ -41,16 +42,25 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	//
 	PC->TriggerJumpScare();
 	
-	// Assumes your HUD widget instance is cached somewhere accessible,
-	// e.g. on your custom PlayerController.
-	//if (UUserWidget* HUDWidget = PC->GetHUD() ? nullptr : nullptr) {} // placeholder, see note below
-	
-	if (bMoveAfterTeleport)
+	/*if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
 	{
-		MoveStartLocation = TeleportLocation;
-		MoveElaspedTime = 0.f;
-		bIsMoving = true;
-	}
+		// Free up the spot this trigger is currently sitting on
+		LocationManager->ReleaseLocation(CurrentLocationSlot);
+
+		FVector NewLocation;
+		if (LocationManager->RequestRandomLocation(NewLocation))
+		{
+			CurrentLocationSlot = NewLocation;
+			SetActorLocation(NewLocation);
+
+			DrawDebugSphere(GetWorld(), NewLocation, 50.0f, 12, FColor::Red, true, -1.0f, 0, 2.0f);
+		}
+	}*/
+	
+	UE_LOG(LogTemp, Warning, TEXT("Trigger location BEFORE teleport: %s"), *GetActorLocation().ToString());
+	//SetActorLocation(TeleportLocation);
+	UE_LOG(LogTemp, Warning, TEXT("Trigger location AFTER teleport: %s"), *GetActorLocation().ToString()); 
+	//DrawDebugSphere(GetWorld(), TeleportLocation, 50.f, 12, FColor::Red, true, -1.f, 0, 2.f);
 	
 	if (!bTriggerOnce)
 	{
@@ -65,6 +75,15 @@ void ACJumpScareTrigger::BeginPlay()
 	Super::BeginPlay();
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACJumpScareTrigger::OnOverlapBegin);
 	
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 50.f, 12, 
+		FColor::Green, true, -1.f, 0, 2.f);
+	
+	CurrentLocationSlot = GetActorLocation();
+
+	/*if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
+	{
+		LocationManager->OccupiedLocations.Add(CurrentLocationSlot);
+	}*/
 }
 
 void ACJumpScareTrigger::ResetCooldown()
@@ -76,24 +95,5 @@ void ACJumpScareTrigger::ResetCooldown()
 void ACJumpScareTrigger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if (!bIsMoving)
-	{
-		MoveElaspedTime += DeltaTime;
-		float Alpha = FMath::Clamp(MoveElaspedTime / MoveDuration, 0.f, 1.f);
-		
-		FVector NewLocation = FMath::Lerp(MoveStartLocation, MoveTargetLocation, Alpha);
-		SetActorLocation(NewLocation);
-		
-		DrawDebugSphere(GetWorld(), NewLocation, 50.f, 12, FColor::Red, false, 0.1f);
-		UE_LOG(LogTemp, Warning, TEXT("Trigger moving: Alpha=%.2f, Location=%s"), Alpha,*NewLocation.ToString())
-		
-		if (Alpha >= 1.f)
-		{
-			bIsMoving = false;
-			UE_LOG(LogTemp, Warning, TEXT("Trigger movement finished!"))
-		}
-	}
-
 }
 

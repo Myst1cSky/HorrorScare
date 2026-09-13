@@ -43,25 +43,11 @@ protected:
 	
 	UFUNCTION()
 	void ResetCooldown();
-	
-	UPROPERTY(EditAnywhere, Category = "JumpScare|Movement")
-	FVector TeleportLocation;
-	
-	UPROPERTY(EditAnywhere, Category = "JumpScare|Movement")
-	FVector MoveTargetLocation;
-	
-	UPROPERTY(EditAnywhere, Category = "JumpScare|Movement")
-	float MoveDuration = 3.f;
-	
-	UPROPERTY(EditAnywhere, Category = "JumpScare|Movement")
-	bool bMoveAfterTeleport = true;
 
+	FVector CurrentLocationSlot;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-private:
-	bool bIsMoving = false;
-	float MoveElaspedTime = 0.f;
-	FVector MoveStartLocation;
 };
