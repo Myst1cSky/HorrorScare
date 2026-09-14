@@ -2,6 +2,7 @@
 
 
 #include "Actors/LocationPoint/CJumpScareLocationPoint.h"
+#include "Components/BillboardComponent.h"
 
 // Sets default values
 ACJumpScareLocationPoint::ACJumpScareLocationPoint()
@@ -11,9 +12,10 @@ ACJumpScareLocationPoint::ACJumpScareLocationPoint()
 	
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
+	
 #if WITH_EDITORONLY_DATA
-	//EditorIcon = CreateDefaultSubobject<UBillboardComponent>(TEXT("EditorIcon"));
-	//EditorIcon->SetupAttachment(RootComponent);
+	EditorIcon = CreateDefaultSubobject<UBillboardComponent>(TEXT("EditorIcon"));
+	EditorIcon->SetupAttachment(RootComponent);
 #endif
 }
 

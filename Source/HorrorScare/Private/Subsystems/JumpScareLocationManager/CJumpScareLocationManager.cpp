@@ -1,16 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Subsystems/JumpScareLocationManager/CJumpScaceLocationManager.h"
+#include "Subsystems/JumpScareLocationManager/CJumpScareLocationManager.h"
+#include "Actors/LocationPoint/CJumpScareLocationPoint.h"
+#include "Kismet/GameplayStatics.h"
 
-void UCJumpScaceLocationManager::OnWorldBeginPlay(UWorld& InWorld)
+void UCJumpScareLocationManager::OnWorldBeginPlay(UWorld& InWorld)
 {
 	Super::OnWorldBeginPlay(InWorld);
 	AllLocations.Empty();
 	OccupiedLocations.Empty();
 
 	TArray<AActor*> FoundPoints;
-	//UGameplayStatics::GetAllActorsOfClass(&InWorld, ACJumpScareLocationPoint::StaticClass(), FoundPoints);
+	UGameplayStatics::GetAllActorsOfClass(&InWorld, ACJumpScareLocationPoint::StaticClass(), FoundPoints);
 
 	for (AActor* Point : FoundPoints)
 	{
@@ -23,7 +25,7 @@ void UCJumpScaceLocationManager::OnWorldBeginPlay(UWorld& InWorld)
 	UE_LOG(LogTemp, Warning, TEXT("JumpScareLocationManager found %d location points"), AllLocations.Num());
 }
 
-bool UCJumpScaceLocationManager::RequestRandomLocation(FVector& OutLocation)
+bool UCJumpScareLocationManager::RequestRandomLocation(FVector& OutLocation)
 {
 	TArray<FVector> FreeLocations;
 	for (const FVector& Loc : AllLocations)
@@ -44,12 +46,12 @@ bool UCJumpScaceLocationManager::RequestRandomLocation(FVector& OutLocation)
 	return true;
 }
 
-void UCJumpScaceLocationManager::ReleaseLocation(const FVector& Location)
+void UCJumpScareLocationManager::ReleaseLocation(const FVector& Location)
 {
 	OccupiedLocations.Remove(Location);
 }
 
-void UCJumpScaceLocationManager::MarkLocationOccupied(const FVector& Location)
+void UCJumpScareLocationManager::MarkLocationOccupied(const FVector& Location)
 {
 	OccupiedLocations.AddUnique(Location);
 }

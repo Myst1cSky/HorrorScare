@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "CJumpScaceLocationManager.generated.h"
+#include "CJumpScareLocationManager.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UCJumpScaceLocationManager : public UWorldSubsystem
+class UCJumpScareLocationManager : public UWorldSubsystem
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void OnWorldBeginPlay(UWorld& InWorld) override;;
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 	
 	UFUNCTION(BlueprintCallable, Category = "JumpScare")
 	bool RequestRandomLocation(FVector& OutLocation);

@@ -25,27 +25,25 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "JumpScare")
 	bool bTriggerOnce = true;
 	
+	UPROPERTY(EditAnywhere, Category = "JumpScare")
+	float CooldownDuration = 3.f;
+	
 	bool bHasTriggered = false;
+	bool bIsOnCooldown = false;
+	
+	FTimerHandle CooldownTimerHandle;
+	FVector CurrentLocationSlot;
 	
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
 		bool bFromSweep, const FHitResult& SweepResult);
 	
-	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditAnywhere, Category = "JumpScare")
-	float CooldownDuration = 3.f;
-	
-	bool bIsOnCooldown = false;
-	
-	FTimerHandle CooldownTimerHandle;
-	
 	UFUNCTION()
 	void ResetCooldown();
-
-	FVector CurrentLocationSlot;
 	
+	virtual void BeginPlay() override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

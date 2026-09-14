@@ -18,17 +18,16 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(VisibleAnywhere, Category = "JumpScare")
-	USceneComponent* Root;
-	
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(VisibleAnywhere, Category = "JumpScare")
-	 class UBillboardComponent* EditorIcon;
-#endif
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, Category = "JumpScare")
+	USceneComponent* Root;
+	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(VisibleAnywhere, Category = "JumpScare")
+	class UBillboardComponent* EditorIcon;
+#endif
 };

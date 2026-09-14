@@ -2,14 +2,12 @@
 
 
 #include "Actors/Triggers/CJumpScareTrigger.h"
-
+#include "Subsystems/JumpScareLocationManager/CJumpScareLocationManager.h"
 #include "Characters/CCharacter.h"
 #include "Characters/Player/CPlayerController.h"
-#include "Widgets/CJumpScareWidget.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-//#include "CJumpScareLocationManager.h"
 
 // Sets default values
 ACJumpScareTrigger::ACJumpScareTrigger()
@@ -22,6 +20,23 @@ ACJumpScareTrigger::ACJumpScareTrigger()
 	TriggerVolume->SetBoxExtent(FVector(10.f, 100.f, 100.f));
 	TriggerVolume->SetCollisionProfileName(TEXT("Trigger"));
 
+}
+
+// Called when the game starts or when spawned
+void ACJumpScareTrigger::BeginPlay()
+{
+	Super::BeginPlay();
+	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACJumpScareTrigger::OnOverlapBegin);
+	
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 50.f, 12, 
+		FColor::Green, true, -1.f, 0, 2.f);
+	
+	CurrentLocationSlot = GetActorLocation();
+
+	if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
+	{
+		LocationManager->MarkLocationOccupied(CurrentLocationSlot);
+	}
 }
 
 void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AActor* OtherActor,
@@ -42,7 +57,7 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 	//
 	PC->TriggerJumpScare();
 	
-	/*if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
+	if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
 	{
 		// Free up the spot this trigger is currently sitting on
 		LocationManager->ReleaseLocation(CurrentLocationSlot);
@@ -55,35 +70,13 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 
 			DrawDebugSphere(GetWorld(), NewLocation, 50.0f, 12, FColor::Red, true, -1.0f, 0, 2.0f);
 		}
-	}*/
-	
-	UE_LOG(LogTemp, Warning, TEXT("Trigger location BEFORE teleport: %s"), *GetActorLocation().ToString());
-	//SetActorLocation(TeleportLocation);
-	UE_LOG(LogTemp, Warning, TEXT("Trigger location AFTER teleport: %s"), *GetActorLocation().ToString()); 
-	//DrawDebugSphere(GetWorld(), TeleportLocation, 50.f, 12, FColor::Red, true, -1.f, 0, 2.f);
+	}
 	
 	if (!bTriggerOnce)
 	{
 		GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &ACJumpScareTrigger::ResetCooldown,
 			CooldownDuration,false);
 	}
-}
-
-// Called when the game starts or when spawned
-void ACJumpScareTrigger::BeginPlay()
-{
-	Super::BeginPlay();
-	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACJumpScareTrigger::OnOverlapBegin);
-	
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 50.f, 12, 
-		FColor::Green, true, -1.f, 0, 2.f);
-	
-	CurrentLocationSlot = GetActorLocation();
-
-	/*if (UCJumpScareLocationManager* LocationManager = GetWorld()->GetSubsystem<UCJumpScareLocationManager>())
-	{
-		LocationManager->OccupiedLocations.Add(CurrentLocationSlot);
-	}*/
 }
 
 void ACJumpScareTrigger::ResetCooldown()
@@ -96,4 +89,3 @@ void ACJumpScareTrigger::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
