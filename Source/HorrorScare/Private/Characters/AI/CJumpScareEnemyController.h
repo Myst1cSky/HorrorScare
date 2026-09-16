@@ -11,6 +11,10 @@
 /**
  * 
  */
+
+class UBehaviorTree;
+class UBehaviorTreeComponent;
+
 UCLASS()
 class ACJumpScareEnemyController : public AAIController
 {
@@ -19,8 +23,13 @@ class ACJumpScareEnemyController : public AAIController
 public:
 	ACJumpScareEnemyController();
 	
+	UPROPERTY(EditAnywhere, Category= "AI")
+	UBehaviorTree* BehaviorTree;
+	
 protected:
 	virtual void BeginPlay() override;
+	
+	virtual void OnPossess(APawn* InPawn) override;
 	
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAISenseConfig_Sight* SightConfig;

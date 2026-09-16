@@ -4,6 +4,8 @@
 #include "Characters/AI/CJumpScareEnemyController.h"
 #include "Characters/CCharacter.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 
 ACJumpScareEnemyController::ACJumpScareEnemyController()
@@ -31,11 +33,32 @@ void ACJumpScareEnemyController::BeginPlay()
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACJumpScareEnemyController::OnTargetPerceived);
 }
 
+void ACJumpScareEnemyController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	
+	if (BehaviorTree)
+	{
+		UBlackboardComponent* BB = nullptr;
+		UseBlackboard(BehaviorTree->BlackboardAsset, BB);
+		RunBehaviorTree(BehaviorTree);
+	}
+	
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACJumpScareEnemyController::OnTargetPerceived);
+}
+
 void ACJumpScareEnemyController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (Cast<ACCharacter>(Actor))
 	{
 		PlayerTarget = Stimulus.WasSuccessfullySensed() ? Actor : nullptr;
+	}
+	
+	if (!Cast<ACCharacter>(Actor)) return;
+	
+	if (UBlackboardComponent* BB = GetBlackboardComponent())
+	{
+		BB->SetValueAsObject(TEXT("TargetActor"), Stimulus.WasSuccessfullySensed() ? Actor : nullptr);
 	}
 }
 
