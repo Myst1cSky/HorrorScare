@@ -15,8 +15,8 @@ ACJumpScareEnemyController::ACJumpScareEnemyController()
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	
-	SightConfig->SightRadius = 500.f;
-	SightConfig->LoseSightRadius = 800.f;
+	SightConfig->SightRadius = 800.f;
+	SightConfig->LoseSightRadius = 400.f;
 	SightConfig->PeripheralVisionAngleDegrees = 180.f;
 	SightConfig->SetMaxAge(5.f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
@@ -68,7 +68,7 @@ void ACJumpScareEnemyController::Tick(float DeltaTime)
 	
 	if (PlayerTarget)
 	{
-		MoveToActor(PlayerTarget, 30.f);
+		MoveToActor(PlayerTarget, 120.f);
 	}
 }
 
