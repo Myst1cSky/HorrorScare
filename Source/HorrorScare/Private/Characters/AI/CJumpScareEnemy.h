@@ -26,6 +26,9 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
+	UPROPERTY()
+	ACharacter* CachedPlayer;
+	
 	UFUNCTION()
 	void CheckForCatch();
 	

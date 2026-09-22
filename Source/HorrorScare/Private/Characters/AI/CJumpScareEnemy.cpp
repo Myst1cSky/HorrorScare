@@ -4,7 +4,12 @@
 #include "Characters/AI/CJumpScareEnemy.h"
 
 #include "Characters/Player/CPlayerController.h"
+#include "AIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Slate/SGameLayerManager.h"
+#include "Splines/SplineMath.h"
 
 // Sets default values
 ACJumpScareEnemy::ACJumpScareEnemy()
@@ -19,6 +24,8 @@ void ACJumpScareEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CachedPlayer = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	
 }
 
 // Called every frame
@@ -31,20 +38,25 @@ void ACJumpScareEnemy::Tick(float DeltaTime)
 
 void ACJumpScareEnemy::CheckForCatch()
 {
-	if (bHasCaughtPlayer) return;
+	if (bHasCaughtPlayer || !CachedPlayer) return;
 	
-	ACharacter* Player = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (!Player) return;
+	const float DistSquared = FVector::DistSquared(GetActorLocation(), CachedPlayer->GetActorLocation());
+	if (DistSquared > FMath::Square(CatchRadius)) return;
 	
-	float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
-	if (Distance <= CatchRadius)
+	bHasCaughtPlayer = true;
+	
+	if (ACPlayerController* PC = Cast<ACPlayerController>(CachedPlayer->GetController()))
 	{
-		bHasCaughtPlayer = true;
-		
-		if (ACPlayerController* PC = Cast<ACPlayerController>(Player->GetController()))
+		PC->TriggerJumpScare();
+	}
+	
+	if (AAIController* AICon = Cast<AAIController>(GetController()))
+	{
+		if (UBehaviorTreeComponent* BTComp = Cast<UBehaviorTreeComponent>(AICon->GetRootComponent()))
 		{
-			PC->TriggerJumpScare();
+			BTComp->StopTree(EBTStopMode::Safe);
 		}
+	
 		// TODO: disable AI movement / player input / handle "caught" state here
 	}
 }

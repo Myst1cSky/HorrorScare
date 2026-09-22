@@ -30,7 +30,6 @@ ACJumpScareEnemyController::ACJumpScareEnemyController()
 void ACJumpScareEnemyController::BeginPlay()
 {
 	Super::BeginPlay();
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACJumpScareEnemyController::OnTargetPerceived);
 }
 
 void ACJumpScareEnemyController::OnPossess(APawn* InPawn)
@@ -43,18 +42,15 @@ void ACJumpScareEnemyController::OnPossess(APawn* InPawn)
 		UseBlackboard(BehaviorTree->BlackboardAsset, BB);
 		RunBehaviorTree(BehaviorTree);
 	}
-	
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACJumpScareEnemyController::OnTargetPerceived);
 }
 
 void ACJumpScareEnemyController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Cast<ACCharacter>(Actor))
+	if (Cast<ACharacter>(Actor))
 	{
 		PlayerTarget = Stimulus.WasSuccessfullySensed() ? Actor : nullptr;
 	}
-	
-	if (!Cast<ACCharacter>(Actor)) return;
 	
 	if (UBlackboardComponent* BB = GetBlackboardComponent())
 	{
@@ -66,10 +62,10 @@ void ACJumpScareEnemyController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (PlayerTarget)
+	/*if (PlayerTarget)
 	{
 		MoveToActor(PlayerTarget, 120.f);
-	}
+	}*/
 }
 
 
