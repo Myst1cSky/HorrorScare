@@ -6,6 +6,7 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 
 ACJumpScareEnemyController::ACJumpScareEnemyController()
@@ -42,19 +43,26 @@ void ACJumpScareEnemyController::OnPossess(APawn* InPawn)
 		UseBlackboard(BehaviorTree->BlackboardAsset, BB);
 		RunBehaviorTree(BehaviorTree);
 	}
+	
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ACJumpScareEnemyController::OnTargetPerceived);
 }
 
 void ACJumpScareEnemyController::OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Cast<ACharacter>(Actor))
-	{
-		PlayerTarget = Stimulus.WasSuccessfullySensed() ? Actor : nullptr;
-	}
+	if (!Cast<ACCharacter>(Actor)) return;
 	
-	if (UBlackboardComponent* BB = GetBlackboardComponent())
+	UBlackboardComponent* BB = GetBlackboardComponent();
+	if (!BB) return;
+	
+	if (Stimulus.WasSuccessfullySensed())
 	{
-		BB->SetValueAsObject(TEXT("TargetActor"), Stimulus.WasSuccessfullySensed() ? Actor : nullptr);
+		GetWorld()->GetTimerManager().ClearTimer(LoseTargetTimerHandle);
+		BB->SetValueAsObject(TEXT("TargetActor"), Actor);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			LoseTargetTimerHandle, this, &ACJumpScareEnemyController::ClearTargetActor, LoseTargetGracePeriod, false);
 	}
 }
 
@@ -62,11 +70,14 @@ void ACJumpScareEnemyController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	/*if (PlayerTarget)
-	{
-		MoveToActor(PlayerTarget, 120.f);
-	}*/
 }
 
+void ACJumpScareEnemyController::ClearTargetActor()
+{
+	if (UBlackboardComponent* BB = GetBlackboardComponent())
+	{
+		BB->SetValueAsObject(TEXT("TargetActor"), nullptr);
+	}
+}
 
 

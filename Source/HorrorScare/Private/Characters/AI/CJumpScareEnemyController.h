@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "CJumpScareEnemyController.generated.h"
 
@@ -34,10 +33,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UAISenseConfig_Sight* SightConfig;
 	
+	UPROPERTY(VisibleAnywhere, Category = "AI")
+	float LoseTargetGracePeriod = 2.f;
+	
+	FTimerHandle LoseTargetTimerHandle;
+	
 	UFUNCTION()
 	void OnTargetPerceived(AActor* Actor, FAIStimulus Stimulus);
 	
-	AActor* PlayerTarget;
+	UFUNCTION()
+	void ClearTargetActor();
 	
 	virtual void Tick(float DeltaTime) override;
 	

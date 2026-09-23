@@ -6,30 +6,53 @@
 #include "GameFramework/Character.h"
 #include "CJumpScareEnemy.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
+class UAnimMontage;
+
 UCLASS()
 class ACJumpScareEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ACJumpScareEnemy();
 	
 	UPROPERTY(EditAnywhere, Category = "JumpScare")
 	float CatchRadius = 100.f;
-	
-	bool bHasCaughtPlayer = false;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere, Category = "JumpScare Catch")
+	USpringArmComponent* CatchCameraArm;
+	
+	UPROPERTY(VisibleAnywhere, Category = "JumpScare Catch")
+	UCameraComponent* CatchCamera;
+	
+	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
+	TArray<UAnimMontage*> HitMontages;
+	
+	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
+	float CameraBlendTime = .75f;
+	
+	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
+	float AnimationDelay = 1.f;
+	
+	FTimerHandle CatchAnimTimerHandle;
+	
+	bool bHasCaughtPlayer = false;
 	
 	UPROPERTY()
 	ACharacter* CachedPlayer;
 	
-	UFUNCTION()
-	void CheckForCatch();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime ) override;
 	
+	void CheckForCatch();
+	void TriggerCatchSequence(ACharacter* Player);
+	
+	UFUNCTION()
+	void PlayHitMontage();
+	
+	UFUNCTION()
+	void OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 };
