@@ -10,12 +10,28 @@
 /**
  * 
  */
+
+class UCGameOverWidget;
+
 UCLASS()
 class ACPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
 public:
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "GameOver")
+	TSubclassOf<UCGameOverWidget> GameOverWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = "GameOver")
+	UCGameOverWidget* GameOverWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameOver")
+	float FadeToBlackDuration = 1.5f;
+
+	UFUNCTION(BlueprintCallable, Category = "GameOver")
+	void ShowGameOverSequence();
+	
 	UPROPERTY(EditDefaultsOnly, Category = "HUD")
 	TSubclassOf<UCJumpScareWidget> JumpScareWidgetClass;
 	
@@ -29,5 +45,10 @@ public:
 	void InitializeWidget();
 	
 protected:
+	FTimerHandle GameOverTimerHandle;
+	
+	UFUNCTION()
+	void ShowGameOverWidget();
+	
 	virtual void BeginPlay() override;
 };

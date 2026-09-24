@@ -5,11 +5,41 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Widgets/CJumpScareWidget.h"
+#include "Widgets/CJumpScareWidget.h"
+#include "Camera/PlayerCameraManager.h"
+#include "Widgets/CGameOverWidget.h"
+
 
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	InitializeWidget();
+}
+
+
+void ACPlayerController::ShowGameOverSequence()
+{
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->StartCameraFade(0.f, 1.f, FadeToBlackDuration, FLinearColor::Black, 
+			false, true);
+	}
+	
+	GetWorld()->GetTimerManager().SetTimer(GameOverTimerHandle, this, &ACPlayerController::ShowGameOverWidget, 
+		FadeToBlackDuration, false);
+}
+
+void ACPlayerController::ShowGameOverWidget()
+{
+	if (!GameOverWidgetClass) return;
+	GameOverWidget = CreateWidget<UCGameOverWidget>(this, GameOverWidgetClass);
+	if (GameOverWidget)
+	{
+		GameOverWidget->AddToViewport(200);
+		
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+	}
 }
 
 void ACPlayerController::TriggerJumpScare()
@@ -18,7 +48,6 @@ void ACPlayerController::TriggerJumpScare()
 	if (!JumpScareWidget) return;
 	JumpScareWidget->PlayJumpScare();
 	UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget"));
-
 }
 
 void ACPlayerController::InitializeWidget()
