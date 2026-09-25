@@ -13,7 +13,14 @@
 void ACPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	InitializeWidget();
+	
+	SetInputMode(FInputModeGameOnly());
+	bShowMouseCursor = false;
+	
+	if (IsLocalController())
+	{
+		InitializeWidget();
+	}
 }
 
 

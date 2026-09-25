@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/Player/CPlayerController.h"
 #include "GameFramework/Character.h"
 #include "CJumpScareEnemy.generated.h"
 
@@ -37,22 +38,26 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
 	float AnimationDelay = 1.f;
 	
-	FTimerHandle CatchAnimTimerHandle;
-	
-	bool bHasCaughtPlayer = false;
-	
 	UPROPERTY()
 	ACharacter* CachedPlayer;
 	
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime ) override;
-	
-	void CheckForCatch();
-	void TriggerCatchSequence(ACharacter* Player);
+	UPROPERTY()
+	ACPlayerController* CachedPC;
 	
 	UFUNCTION()
 	void PlayHitMontage();
 	
 	UFUNCTION()
 	void OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	
+	FTimerHandle CatchAnimTimerHandle;
+	
+	bool bHasCaughtPlayer = false;
+	
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime ) override;
+	
+	void CheckForCatch();
+	void TriggerCatchSequence();
+	
 };

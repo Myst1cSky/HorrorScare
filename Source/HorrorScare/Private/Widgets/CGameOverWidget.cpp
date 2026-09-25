@@ -2,6 +2,7 @@
 
 
 #include "Widgets/CGameOverWidget.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -23,7 +24,14 @@ void UCGameOverWidget::NativeConstruct()
 
 void UCGameOverWidget::OnRestartBClicked()
 {
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		PC->ResetIgnoreMoveInput();
+		PC->ResetIgnoreLookInput();
+	}
+	
+	const FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this, true);
+	UGameplayStatics::OpenLevel(this, FName(*CurrentLevelName));
 }
 
 void UCGameOverWidget::OnQuitBClicked()
