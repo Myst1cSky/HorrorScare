@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Widgets/CJumpScareWidget.h"
+#include "Widgets/CStaminaWidget.h"
 #include "CPlayerController.generated.h"
 
 /**
@@ -40,6 +41,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void TriggerJumpScare();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD")
+	TSubclassOf<UCStaminaWidget> StaminaWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, Category = "HUD")
+	UCStaminaWidget* StaminaWidget;
 	
 	UFUNCTION()
 	void InitializeWidget();

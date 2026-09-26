@@ -5,7 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Widgets/CJumpScareWidget.h"
-#include "Widgets/CJumpScareWidget.h"
+#include "Widgets/CStaminaWidget.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Widgets/CGameOverWidget.h"
 
@@ -68,8 +68,12 @@ void ACPlayerController::InitializeWidget()
 			UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget added"));
 		}
 	}
-	else
+	if (StaminaWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WidgetClass does not exist"));
+		StaminaWidget = CreateWidget<UCStaminaWidget>(this, StaminaWidgetClass);
+		if (StaminaWidget)
+		{
+			StaminaWidget->AddToViewport(50);
+		}
 	}
 }
