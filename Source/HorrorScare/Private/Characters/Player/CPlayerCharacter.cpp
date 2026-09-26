@@ -31,7 +31,8 @@ void ACPlayerCharacter::Tick(float DeltaTime)
 		if (PC->StaminaWidget)
 		{
 			const float Percent = GetStaminaPercent();
-			PC->StaminaWidget->UpdateStamina(Percent);
+			const bool bIsDraining = bIsSprinting && !GetVelocity().IsNearlyZero();
+			PC->StaminaWidget->UpdateStamina(GetStaminaPercent(), bIsDraining);
 			
 			FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Percent);
 			PC->StaminaWidget->SetFillColor(Color);

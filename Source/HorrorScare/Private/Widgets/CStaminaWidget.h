@@ -19,9 +19,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* StaminaBar;
 	
+	UPROPERTY(Transient, meta = (BindWidgetAnim), BlueprintReadOnly)
+	UWidgetAnimation* LowStaminaBlink;
+	
 	UFUNCTION(BlueprintCallable, Category = "Stamina")
-	void UpdateStamina(float Percent);
+	void UpdateStamina(float Percent, bool bIsDraining);
 	
 	UFUNCTION(BlueprintCallable, Category = "Stamina")
 	void SetFillColor(FLinearColor NewColor);
+	
+protected:
+	bool bIsBlinking = false;
 };

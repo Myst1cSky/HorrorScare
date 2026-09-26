@@ -26,6 +26,11 @@ void ACPlayerController::BeginPlay()
 
 void ACPlayerController::ShowGameOverSequence()
 {
+	if (StaminaWidget)
+	{
+		StaminaWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	
 	if (PlayerCameraManager)
 	{
 		PlayerCameraManager->StartCameraFade(0.f, 1.f, FadeToBlackDuration, FLinearColor::Black, 
@@ -71,9 +76,11 @@ void ACPlayerController::InitializeWidget()
 	if (StaminaWidgetClass)
 	{
 		StaminaWidget = CreateWidget<UCStaminaWidget>(this, StaminaWidgetClass);
+		UE_LOG(LogTemp, Warning, TEXT("StaminaWidget created: %s"), StaminaWidget ? TEXT("valid") : TEXT("NULL"));
 		if (StaminaWidget)
 		{
 			StaminaWidget->AddToViewport(50);
+			UE_LOG(LogTemp, Warning, TEXT("StaminaWidget added to viewport"));
 		}
 	}
 }

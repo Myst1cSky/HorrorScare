@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD")
 	TSubclassOf<UCStaminaWidget> StaminaWidgetClass;
 
-	UPROPERTY(BlueprintReadOnly, Category = "HUD")
+	UPROPERTY(EditDefaultsOnly, Category = "HUD")
 	UCStaminaWidget* StaminaWidget;
 	
 	UFUNCTION()
