@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Characters/Player/CPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -71,7 +72,13 @@ void ACJumpScareEnemy::CheckForCatch()
 		MoveComp->StopMovementImmediately();
 		MoveComp->DisableMovement();
 	}
+	
+	if (ACPlayerCharacter* Player = Cast<ACPlayerCharacter>(CachedPlayer))
+	{
+		Player->StopHeartbeat();
+	}
 
+	PlayJumpScareSounds();
 	TriggerCatchSequence();
 }
 
@@ -95,6 +102,17 @@ void ACJumpScareEnemy::TriggerCatchSequence()
 	
 }
 
+void ACJumpScareEnemy::PlayJumpScareSounds()
+{
+	if (JumpScareSounds.Num() == 0) return;
+	
+	const int32 RandomIndex = FMath::RandRange(0, JumpScareSounds.Num() - 1);
+	USoundBase* ChosenSound = JumpScareSounds[RandomIndex];
+	if (!ChosenSound) return;
+	
+	UGameplayStatics::PlaySound2D(this, ChosenSound);
+}
+
 void ACJumpScareEnemy::PlayHitMontage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("PlayHitMontage called. HitMontages count: %d"), HitMontages.Num());
@@ -112,6 +130,7 @@ void ACJumpScareEnemy::PlayHitMontage()
 	EndDelegate.BindUObject(this, &ACJumpScareEnemy::OnHitMontageEnded);
 	AnimInstance->Montage_Play(ChosenMontage);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ChosenMontage);
+	
 }
 
 void ACJumpScareEnemy::OnHitMontageEnded(UAnimMontage* Montage, bool bInterrupted)

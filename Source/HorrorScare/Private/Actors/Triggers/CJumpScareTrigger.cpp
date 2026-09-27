@@ -7,7 +7,10 @@
 #include "Characters/Player/CPlayerController.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+
+#if WITH_EDITOR
 #include "DrawDebugHelpers.h"
+#endif
 
 // Sets default values
 ACJumpScareTrigger::ACJumpScareTrigger()
@@ -28,8 +31,10 @@ void ACJumpScareTrigger::BeginPlay()
 	Super::BeginPlay();
 	TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &ACJumpScareTrigger::OnOverlapBegin);
 	
+#if WITH_EDITOR
 	DrawDebugSphere(GetWorld(), GetActorLocation(), 50.f, 12, 
 		FColor::Green, true, -1.f, 0, 2.f);
+#endif
 	
 	CurrentLocationSlot = GetActorLocation();
 
@@ -67,8 +72,10 @@ void ACJumpScareTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedCom, AAct
 		{
 			CurrentLocationSlot = NewLocation;
 			SetActorLocation(NewLocation);
-
-			DrawDebugSphere(GetWorld(), NewLocation, 50.0f, 12, FColor::Red, true, -1.0f, 0, 2.0f);
+#if WITH_EDITOR
+			DrawDebugSphere(GetWorld(), NewLocation, 50.0f, 12, 
+				FColor::Red, true, -1.0f, 0, 2.0f);
+#endif
 		}
 	}
 	

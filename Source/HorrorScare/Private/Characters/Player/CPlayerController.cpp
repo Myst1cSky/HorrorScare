@@ -19,7 +19,7 @@ void ACPlayerController::BeginPlay()
 	
 	if (IsLocalController())
 	{
-		InitializeWidget();
+		InitializeWidgets();
 	}
 }
 
@@ -62,7 +62,7 @@ void ACPlayerController::TriggerJumpScare()
 	UE_LOG(LogTemp, Warning, TEXT("JumpScareWidget"));
 }
 
-void ACPlayerController::InitializeWidget()
+void ACPlayerController::InitializeWidgets()
 {
 	if (JumpScareWidgetClass)
 	{

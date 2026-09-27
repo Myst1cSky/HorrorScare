@@ -49,7 +49,7 @@ public:
 	UCStaminaWidget* StaminaWidget;
 	
 	UFUNCTION()
-	void InitializeWidget();
+	void InitializeWidgets();
 	
 protected:
 	FTimerHandle GameOverTimerHandle;

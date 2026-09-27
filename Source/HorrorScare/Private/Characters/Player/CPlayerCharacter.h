@@ -9,6 +9,11 @@
 /**
  * 
  */
+
+class UAudioComponent;
+class USoundBase;
+class ACJumpScareEnemy;
+
 UCLASS()
 class ACPlayerCharacter : public ACCharacter
 {
@@ -84,9 +89,43 @@ protected:
 	void StartSprint();
 	void StopSprint();
 	void UpdateStamina(float DeltaTime);
+	void DebugTriggerJumpScare();
+	void UpdateStaminaWidget();
 
 public:
 	UFUNCTION(BlueprintPure, Category = "Stamina")
 	float GetStaminaPercent() const { return MaxStamina > 0.0f ? CurrentStamina / MaxStamina : 0.0f; }
 	
+	//-----------------------------------------------------//
+	//                     Audio                          //
+	//----------------------------------------------------//
+	
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Audio")
+	UAudioComponent* HeartbeatAudioCom;
+	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* HeartbeatSound;
+	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float MinHeartbeatDistance = 300.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float MaxHeartbeatDistance = 1500.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float MinHeartbeatPitch = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	float MaxHeartbeatPitch = 1.4f;
+	
+	UPROPERTY()
+	TArray<ACJumpScareEnemy*> CachedEnemies;
+	
+	void UpdateHeartbeat();
+	float GetDistanceToNearestEnemy() const;
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void StopHeartbeat();
 };

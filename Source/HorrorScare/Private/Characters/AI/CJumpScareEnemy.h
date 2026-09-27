@@ -10,6 +10,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UAnimMontage;
+class USoundBase;
 
 UCLASS()
 class ACJumpScareEnemy : public ACharacter
@@ -38,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
 	float AnimationDelay = 1.f;
 	
+	UPROPERTY(EditAnywhere, Category = "JumpScare Catch")
+	TArray<USoundBase*> JumpScareSounds;
+	
 	UPROPERTY()
 	ACharacter* CachedPlayer;
 	
@@ -59,5 +63,5 @@ protected:
 	
 	void CheckForCatch();
 	void TriggerCatchSequence();
-	
+	void PlayJumpScareSounds();
 };

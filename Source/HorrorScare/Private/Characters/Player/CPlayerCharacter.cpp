@@ -3,14 +3,22 @@
 
 #include "Characters/Player/CPlayerCharacter.h"
 #include "Characters/Player/CPlayerController.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Characters/AI/CJumpScareEnemy.h"
+#include "Kismet/GameplayStatics.h"
 
 ACPlayerCharacter::ACPlayerCharacter()
 {
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(720.f);
+	
+	HeartbeatAudioCom = CreateDefaultSubobject<UAudioComponent>(TEXT("HeartbeatAudioComponent"));
+	HeartbeatAudioCom->SetupAttachment(RootComponent);
+	HeartbeatAudioCom->bAutoActivate = false;
+	HeartbeatAudioCom->SetVolumeMultiplier(0.f);
 }
 
 void ACPlayerCharacter::BeginPlay()
@@ -19,25 +27,88 @@ void ACPlayerCharacter::BeginPlay()
 	
 	CurrentStamina = MaxStamina;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	
+	TArray<AActor*> FoundEnemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACJumpScareEnemy::StaticClass(), FoundEnemies);
+	for (AActor* Enemy : FoundEnemies)
+	{
+		if (ACJumpScareEnemy* TypedEnemy = Cast<ACJumpScareEnemy>(Enemy))
+		{
+			CachedEnemies.Add(TypedEnemy);
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Cached %d enemies"), CachedEnemies.Num());
+		UE_LOG(LogTemp, Warning, TEXT("HeartbeatSound: %s"), HeartbeatSound ? TEXT("valid") : TEXT("NULL"));
+		UE_LOG(LogTemp, Warning, TEXT("HeartbeatAudioComponent: %s"), HeartbeatAudioCom ? TEXT("valid") : TEXT("NULL"));
+	}
+	
+	if (HeartbeatSound && HeartbeatAudioCom)
+	{
+		HeartbeatAudioCom->SetSound(HeartbeatSound);
+		HeartbeatAudioCom->Play();
+		UE_LOG(LogTemp, Warning, TEXT("HeartbeatAudioComponent->Play() called"));
+	}
 }
 
 void ACPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	UpdateStamina(DeltaTime);
+	UpdateStaminaWidget();
+	UpdateHeartbeat();
 	
-	if (ACPlayerController* PC = Cast<ACPlayerController>(GetController()))
-	{
-		if (PC->StaminaWidget)
-		{
-			const float Percent = GetStaminaPercent();
-			const bool bIsDraining = bIsSprinting && !GetVelocity().IsNearlyZero();
-			PC->StaminaWidget->UpdateStamina(GetStaminaPercent(), bIsDraining);
+}
+
+void ACPlayerCharacter::UpdateStaminaWidget()
+{
+	ACPlayerController* PC = Cast<ACPlayerController>(GetController());
+	if (!PC || !PC->StaminaWidget) return;
+	
+	const float Percent = GetStaminaPercent();
+	const bool bIsDraining = bIsSprinting && !GetVelocity().IsNearlyZero();
+	PC->StaminaWidget->UpdateStamina(GetStaminaPercent(), bIsDraining);
 			
-			FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Percent);
-			PC->StaminaWidget->SetFillColor(Color);
+	FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor::Red, FLinearColor::Green, Percent);
+	PC->StaminaWidget->SetFillColor(Color);
+}
+
+void ACPlayerCharacter::StopHeartbeat()
+{
+	if (HeartbeatAudioCom && HeartbeatAudioCom->IsPlaying())
+	{
+		HeartbeatAudioCom->Stop();
+	}
+}
+
+void ACPlayerCharacter::UpdateHeartbeat()
+{
+	if (!HeartbeatAudioCom) return;
+
+	const float Distance = GetDistanceToNearestEnemy();
+	UE_LOG(LogTemp, Warning, TEXT("Distance to nearest enemy: %.1f"), Distance);
+
+	const float Alpha = 1.0f - FMath::Clamp(
+		(Distance - MinHeartbeatDistance) / (MaxHeartbeatDistance - MinHeartbeatDistance), 0.0f, 1.0f);
+
+	HeartbeatAudioCom->SetVolumeMultiplier(Alpha);
+	HeartbeatAudioCom->SetPitchMultiplier(FMath::Lerp(MinHeartbeatPitch, MaxHeartbeatPitch, Alpha));
+}
+
+float ACPlayerCharacter::GetDistanceToNearestEnemy() const
+{
+	float ClosestDistSquared = TNumericLimits<float>::Max();
+
+	for (const ACJumpScareEnemy* Enemy : CachedEnemies)
+	{
+		if (!Enemy) continue;
+
+		const float DistSquared = FVector::DistSquared(GetActorLocation(), Enemy->GetActorLocation());
+		if (DistSquared < ClosestDistSquared)
+		{
+			ClosestDistSquared = DistSquared;
 		}
 	}
+	
+	return FMath::Sqrt(ClosestDistSquared);
 }
 
 void ACPlayerCharacter::PawnClientRestart()
@@ -104,6 +175,14 @@ FVector ACPlayerCharacter::GetMoveFwdDirection() const
 	return FVector::CrossProduct(GetRightDirection(), FVector::UpVector);
 }
 
+void ACPlayerCharacter::DebugTriggerJumpScare()
+{
+	if (ACPlayerController* PC = Cast<ACPlayerController>(GetController()))
+	{
+		PC->TriggerJumpScare();
+	}
+}
+
 void ACPlayerCharacter::StartSprint()
 {
 	if (CurrentStamina <= MinStaminaToSprint) return;
@@ -143,14 +222,5 @@ void ACPlayerCharacter::UpdateStamina(float DeltaTime)
 		{
 			CurrentStamina = FMath::Min(MaxStamina, CurrentStamina + StaminaRegenRate * DeltaTime);
 		}
-	}
-}
-
-// New function on your character, since input usually lives there in Enhanced Input setups
-void ACCharacter::DebugTriggerJumpScare()
-{
-	if (ACPlayerController* PC = Cast<ACPlayerController>(GetController()))
-	{
-		PC->TriggerJumpScare();
 	}
 }
