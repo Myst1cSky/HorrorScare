@@ -76,6 +76,7 @@ void ACJumpScareEnemy::CheckForCatch()
 	if (ACPlayerCharacter* Player = Cast<ACPlayerCharacter>(CachedPlayer))
 	{
 		Player->StopHeartbeat();
+		Player->DisableFlashlight();
 	}
 
 	PlayJumpScareSounds();

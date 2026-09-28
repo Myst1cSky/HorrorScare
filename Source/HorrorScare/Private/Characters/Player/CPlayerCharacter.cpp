@@ -4,6 +4,7 @@
 #include "Characters/Player/CPlayerCharacter.h"
 #include "Characters/Player/CPlayerController.h"
 #include "Components/AudioComponent.h"
+#include "Components/SpotlightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -19,6 +20,15 @@ ACPlayerCharacter::ACPlayerCharacter()
 	HeartbeatAudioCom->SetupAttachment(RootComponent);
 	HeartbeatAudioCom->bAutoActivate = false;
 	HeartbeatAudioCom->SetVolumeMultiplier(0.f);
+	
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+	Flashlight->SetupAttachment(RootComponent);
+	Flashlight->SetRelativeLocation(FVector(30.f, 0.f, 60.f));
+	Flashlight->Intensity = 5000.f;
+	Flashlight->InnerConeAngle = 10.f;
+	Flashlight->OuterConeAngle = 25.f;
+	Flashlight->AttenuationRadius = 2000.f;
+	Flashlight->SetVisibility(false);
 }
 
 void ACPlayerCharacter::BeginPlay()
@@ -55,6 +65,7 @@ void ACPlayerCharacter::Tick(float DeltaTime)
 	UpdateStamina(DeltaTime);
 	UpdateStaminaWidget();
 	UpdateHeartbeat();
+	UpdateFlashlightRotation();
 	
 }
 
@@ -77,6 +88,34 @@ void ACPlayerCharacter::StopHeartbeat()
 	{
 		HeartbeatAudioCom->Stop();
 	}
+}
+
+void ACPlayerCharacter::ToggleFlashlight()
+{
+	if (bFlashlightLocked) return;
+	
+	bIsFlashlightOn = !bIsFlashlightOn;
+	Flashlight->SetVisibility(bIsFlashlightOn);
+	
+	if (FlashlightSound)
+	{
+		UGameplayStatics::PlaySound2D(this, FlashlightSound);
+	}
+}
+
+void ACPlayerCharacter::UpdateFlashlightRotation()
+{
+	if (bIsFlashlightOn)
+	{
+		Flashlight->SetWorldRotation(GetControlRotation());
+	}
+}
+
+void ACPlayerCharacter::DisableFlashlight()
+{
+	bFlashlightLocked = true;
+	bIsFlashlightOn = false;
+	Flashlight->SetVisibility(false);
 }
 
 void ACPlayerCharacter::UpdateHeartbeat()
@@ -136,6 +175,10 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			EnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Started, this, &ACPlayerCharacter::StartSprint);
 			EnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Completed, this, &ACPlayerCharacter::StopSprint);
 			EnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Canceled, this, &ACPlayerCharacter::StopSprint);
+		}
+		if (FlashlightInputAction)
+		{
+			EnhancedInputComponent->BindAction(FlashlightInputAction, ETriggerEvent::Started, this, &ACPlayerCharacter::ToggleFlashlight);
 		}
 		if (DebugJumpScareAction)
 		{

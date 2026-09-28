@@ -11,6 +11,7 @@
  */
 
 class UAudioComponent;
+class USpotLightComponent;
 class USoundBase;
 class ACJumpScareEnemy;
 
@@ -84,7 +85,7 @@ protected:
 	float TimeSinceStoppedSprinting = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
-	class UInputAction* SprintInputAction;
+	UInputAction* SprintInputAction;
 
 	void StartSprint();
 	void StopSprint();
@@ -128,4 +129,28 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void StopHeartbeat();
+	
+	//-----------------------------------------------------//
+	//                     Flashlight                     //
+	//----------------------------------------------------//
+	
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Flashlight")
+	USpotLightComponent* Flashlight;
+	
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FlashlightInputAction;
+	
+	UPROPERTY(EditAnywhere, Category = "Flashlight")
+	USoundBase* FlashlightSound;
+	
+	bool bIsFlashlightOn = false;
+	bool bFlashlightLocked = false;
+	
+	void ToggleFlashlight();
+	void UpdateFlashlightRotation();
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Flashlight")
+	void DisableFlashlight();
 };
