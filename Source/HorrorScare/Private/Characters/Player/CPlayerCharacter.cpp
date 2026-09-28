@@ -11,16 +11,28 @@
 #include "Characters/AI/CJumpScareEnemy.h"
 #include "Kismet/GameplayStatics.h"
 
+
+
 ACPlayerCharacter::ACPlayerCharacter()
 {
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(720.f);
 	
+	CreateHeartbeatAudio();
+	
+	CreateFlashlight();
+}
+
+void ACPlayerCharacter::CreateHeartbeatAudio()
+{
 	HeartbeatAudioCom = CreateDefaultSubobject<UAudioComponent>(TEXT("HeartbeatAudioComponent"));
 	HeartbeatAudioCom->SetupAttachment(RootComponent);
 	HeartbeatAudioCom->bAutoActivate = false;
 	HeartbeatAudioCom->SetVolumeMultiplier(0.f);
-	
+}
+
+void ACPlayerCharacter::CreateFlashlight()
+{
 	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
 	Flashlight->SetupAttachment(RootComponent);
 	Flashlight->SetRelativeLocation(FVector(30.f, 0.f, 60.f));

@@ -21,6 +21,8 @@ class ACPlayerCharacter : public ACCharacter
 	GENERATED_BODY()
 public:
 	ACPlayerCharacter();
+	void CreateFlashlight();
+	void CreateHeartbeatAudio();
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
